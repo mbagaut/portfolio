@@ -1,0 +1,100 @@
+.hero {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 524px;
+  padding-top: 140px;
+  background-color: #6580df;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  height: 824px;
+  width: 490px;
+  
+  background-image: url(../../images/blink.png), url(../../images/praktikum-logo.png);
+  background-repeat: no-repeat;
+  background-position: 30% 53%, center 112%;
+  background-size: 20px, contain;
+  animation-name: image, blink;
+	animation-duration: 2s, 5s;
+	animation-timing-function: ease-in-out, linear;
+	animation-direction: normal;
+	animation-iteration-count: 1, infinite;
+  animation-delay: 0s, 3s;
+}
+
+@media (max-width: 360px) {
+  .hero {
+    height: 570px;
+    padding-top: 207px;
+
+    background-position: center 352px;
+    background-size: 248px;
+  }
+}
+
+.hero__text {
+  max-width: 730px;
+  margin: 0;
+
+  font-weight: normal;
+  font-size: 50px;
+  line-height: 1.16;
+  text-align: center;
+  letter-spacing: -0.04em;
+  z-index: 1;
+}
+
+@media (max-width: 768px) {
+  .hero__text {
+    padding: 0 20px;
+  }
+}
+
+@media (max-width: 515px) {
+  .hero__text {
+    padding: 0 10px;
+
+    font-size: 41px;
+    line-height: 1.26;
+  }
+}
+
+@media (max-width: 360px) {
+  .hero__text {
+    font-size: 31px;
+  }
+}
+
+@keyframes image {
+  0% {
+    transform: translate(0, 20%);
+	}
+	100% {
+    transform: translate(0);
+	}
+}
+
+@keyframes blink {
+  0% {
+    background-position: 30% 53%, center 112%;
+	}
+  5% {
+    background-position: 30% 56%, center 112%;
+  }
+	10% {
+    background-position: 30% 53%, center 112%;
+	}
+  100% {
+    background-position: 30% 53%, center 112%;
+	}
+}

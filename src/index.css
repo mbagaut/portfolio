@@ -1,0 +1,36 @@
+@import url("./vendor/normalize.css");
+@import url("./vendor/fonts/fonts.css");
+
+/*----------------------- Блок Header ------------------------------ */
+@import url("./components/header/Header.css");
+
+@import url("./components/navigation/Navigation.css");
+@import url("./components/authorization-link/AuthorizationLink.css");
+
+/*----------------------- Блок Main ------------------------------ */
+@import url("./components/main/Main.css");
+
+@import url("./components/promo/Promo.css");
+@import url("./components/navtab/Navtab.css");
+@import url("./components/techs/Techs.css");
+@import url("./components/aboutMe/AboutMe.css");
+@import url("./components/portfolio/Portfolio.css");
+
+/*----------------------- Блок Projects ------------------------------ */
+@import url("./components/projects/Projects.css");
+
+/*----------------------- Блок Project ------------------------------ */
+@import url("./components/projectCard/ProjectCard.css");
+
+/*----------------------- Блок Contacts ------------------------------ */
+@import url("./components/contacts/Contacts.css");
+
+/*----------------------- Блок Menu ------------------------------ */
+@import url("./components/menu/Menu.css");
+
+/*----------------------- Блок PageNotFound ------------------------------ */
+@import url("./components/pageNotFound/PageNotFound.css");
+
+/*----------------------- Блок Footer ------------------------------ */
+
+@import url("./components/footer/Footer.css");

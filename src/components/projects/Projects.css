@@ -1,0 +1,15 @@
+.projects {
+	display: grid;
+	justify-content: center;
+	box-sizing: border-box;
+	min-width: 320px;
+	max-width: 1440px;
+	margin: 79px auto 0;
+	padding: 0 20px;
+
+	list-style-type: none;
+	column-gap: 17px;
+
+	grid-template-columns: repeat(auto-fill, minmax(300px, 390px));
+	row-gap: 20px;
+}
