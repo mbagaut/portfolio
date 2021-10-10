@@ -30,7 +30,7 @@ function Portfolio(props) {
   return (
     <section ref={portfolio} className="portfolio">
       <ReactTooltip id="howToLearn" overridePosition={overrideTooltipePosition}>
-        <video class="portfolio__video" autoplay="" loop="loop" muted>
+        <video className="portfolio__video" autoplay="" loop="loop" muted>
           <source src={howToLearnAv1} type="video/mp4" />
           <source src={howToLearnWebM} type="video/webm" />
           <source src={howToLearn} type="video/mp4" />
@@ -42,7 +42,7 @@ function Portfolio(props) {
         id="russianTravel"
         overridePosition={overrideTooltipePosition}
       >
-        <video class="portfolio__video" autoplay="" loop="loop" muted>
+        <video className="portfolio__video" autoplay="" loop="loop" muted>
           <source src={russianTravelAv1} type="video/mp4" />
           <source src={russianTravelWebM} type="video/webm" />
           <source src={russianTravel} type="video/mp4" />
@@ -51,7 +51,7 @@ function Portfolio(props) {
       </ReactTooltip>
 
       <ReactTooltip id="mesto" overridePosition={overrideTooltipePosition}>
-        <video class="portfolio__video" autoplay="" loop="loop" muted>
+        <video className="portfolio__video" autoplay="" loop="loop" muted>
           <source src={mestoAv1} type="video/mp4" />
           <source src={mestoWebM} type="video/webm" />
           <source src={mesto} type="video/mp4" />
