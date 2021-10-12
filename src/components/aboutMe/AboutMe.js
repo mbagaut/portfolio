@@ -2,17 +2,16 @@ import React from "react";
 
 function AboutMe(props) {
   const { aboutMe } = props;
-  const { useState, useEffect } = React;
+  const { useState, useEffect, useRef } = React;
 
-  let canvas = null;
   const [color, setColor] = useState("#000000");
-  const [lastX, setLastX] = useState(0);
-  const [lastY, setLastY] = useState(0);
-  const [drawing, setDrawing] = useState(false);
+  const [message, setMessage] = useState("");
+  const [drawingIsFinished, setDrawingIsFinished] = useState(true);
   const [coordinates, setCoordinates] = useState([]);
   const [lsIsCleared, setLsIsCleared] = useState(
     !localStorage.getItem("coords") && true
   );
+
   const btnStyle = {
     position: "absolute",
     left: "5px",
@@ -21,11 +20,42 @@ function AboutMe(props) {
     border: "1px solid #000",
   };
 
-  function updateCanvas() {
+  const canvasRef = useRef(null);
+  const contextRef = useRef(null);
+
+  const [isDrawing, setIsDrawing] = useState(false);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect(); // возвращает размер элемента и его позицию относительно viewport
+
     canvas.width = rect.width;
     canvas.height = rect.height;
-    makeAText();
+
+    const ctx = canvas.getContext("2d");
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.lineWidth = 5;
+
+    const grad = ctx.createLinearGradient(0, 0, 500, 0); // позиции градиента
+    grad.addColorStop("0", "magenta");
+    grad.addColorStop(".50", "blue");
+    grad.addColorStop("1", "red");
+
+    ctx.textAlign = "center";
+    ctx.font = "20px Inter";
+    ctx.fillStyle = grad;
+    // Цвет, размер и т.п. должны  быть до fillText
+    ctx.fillText("Рисуй усы)", canvas.width / 2, canvas.height / 1.2); // центровка надписи
+
+    contextRef.current = ctx;
+  }, []);
+
+  function updateCanvas() {
+    const rect = canvasRef.current.getBoundingClientRect();
+    const canvas = canvasRef.current;
+    canvas.width = rect.width;
+    canvas.height = rect.height;
   }
 
   useEffect(() => {
@@ -35,61 +65,54 @@ function AboutMe(props) {
     };
   });
 
-  useEffect(() => {
-    makeAText();
-  }, []);
-
-  const makeAText = () => {
-    const rect = canvas.getBoundingClientRect(); // возвращает размер элемента и его позицию относительно viewport
-    const ctx = canvas.getContext("2d");
-    canvas.width = rect.width;
-    canvas.height = rect.height;
-
-    const grad = ctx.createLinearGradient(0, 0, 500, 0); // позиции градиента
-    grad.addColorStop("0", "magenta");
-    grad.addColorStop(".50", "blue");
-    grad.addColorStop("1", "red");
-
-    ctx.textAlign = "center"; // выравнивание текста по центру
-    ctx.font = "20px Inter";
-    ctx.fillStyle = grad; // можно указать просто цвет типа "magenta".
-    // Цвет, размер и т.п. должны  быть до fillText
-    ctx.fillText("Рисуй усы)", canvas.width / 2, canvas.height / 1.2); // центровка надписи
+  const startDrawing = () => {
+    contextRef.current.beginPath();
+    setIsDrawing(true);
   };
 
-  function draw(evt) {
-    const rect = canvas.getBoundingClientRect();
-    const x = evt.nativeEvent.clientX - rect.left;
-    const y = evt.nativeEvent.clientY - rect.top;
-    const ctx = canvas.getContext("2d");
+  const endDrawing = () => {
+    if (isDrawing) {
+      const cords = Object.assign([], coordinates);
+      cords.push("x");
+      setCoordinates(cords);
 
-    ctx.strokeStyle = color;
-    ctx.lineJoin = "round";
-    ctx.lineCap = "round";
-    ctx.lineWidth = 5;
+      contextRef.current.beginPath();
+      contextRef.current.stroke();
+      contextRef.current.closePath();
 
-    if (drawing) {
+      setIsDrawing(false);
+    }
+  };
+
+  const draw = (evt) => {
+    const { nativeEvent } = evt;
+    if (isDrawing) {
+      const rect = canvasRef.current.getBoundingClientRect();
+      contextRef.current.strokeStyle = color;
+      let x;
+      let y;
+
+      if (evt._reactName === "onMouseMove") {
+        const { offsetX, offsetY } = nativeEvent;
+        x = offsetX;
+        y = offsetY;
+      } else if (evt._reactName === "onTouchMove") {
+        const { clientX, clientY } = nativeEvent.targetTouches[0];
+        x = clientX - rect.left;
+        y = clientY - rect.top;
+      }
+
       const cords = Object.assign([], coordinates);
       cords.push([x, y, color]);
       setCoordinates(cords);
-
-      ctx.beginPath();
-      ctx.moveTo(lastX, lastY);
-      ctx.lineTo(x, y);
-      ctx.stroke();
-    } else {
-      const cords = Object.assign([], coordinates);
-      cords.push("mouseup");
-      setCoordinates(cords);
+      contextRef.current.lineTo(x, y);
+      contextRef.current.stroke();
     }
-
-    setLastX(x);
-    setLastY(y);
-  }
+  };
 
   function clear(arg) {
-    const ctx = canvas.getContext("2d");
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const canvas = canvasRef.current;
+    contextRef.current.clearRect(0, 0, canvas.width, canvas.height);
     if (arg === "full") {
       setCoordinates([]);
       localStorage.removeItem("coords");
@@ -98,20 +121,55 @@ function AboutMe(props) {
   }
 
   function saveCurrentPosition() {
-    localStorage.setItem("coords", JSON.stringify(coordinates));
-    setLsIsCleared(false);
+    if (coordinates.length > 1) {
+      localStorage.setItem("coords", JSON.stringify(coordinates));
+      setLsIsCleared(false);
+      setMessage("сохранили");
+      console.log("сохранили");
+      return;
+    }
+    setMessage("нечего сохранять");
+    console.log("нечего сохранять");
+  }
+
+  const messages = [
+    "Два вы художник!",
+    "Красота!",
+    "Долго ли, умеючи",
+    "ШАДАВР!",
+    "А мне идёт..)",
+    "Господа гусары, все в кабак!",
+    "Вы можете лучше)",
+    "Рисование не ваш конёк",
+    "Усы, а не.. что это вообще?",
+    "Сойдёт, так в Европе модно... говорят",
+    "Вам ещё не надоело? )",
+  ];
+
+  function getRandomNum() {
+    return Math.floor(Math.random() * 10);
   }
 
   function replay() {
+    setDrawingIsFinished(false);
+
     if (lsIsCleared) {
+      setMessage("нечего рисовать");
       console.log("нечего рисовать");
+      setDrawingIsFinished(true);
       return;
     }
-    const ctx = canvas.getContext("2d");
+
+    const ctx = contextRef.current;
+
     const timer = setInterval(() => {
-      if (!coordinates.length) {
+      if (!coordinates.length || coordinates.length === "nule") {
         clearInterval(timer);
         ctx.beginPath();
+        setDrawingIsFinished(true);
+
+        setMessage(messages[getRandomNum()]);
+        console.log(messages[getRandomNum()]);
         return;
       }
 
@@ -130,20 +188,22 @@ function AboutMe(props) {
   }
 
   function onKeyDown(evt) {
-    if (evt.key === "s") {
+    if (evt.key === "s" || evt.key === "ы") {
       saveCurrentPosition();
-      console.log("сохранили");
-    } else if (evt.key === "r") {
-      console.log("проигрываем...");
+    } else if ((evt.key === "r" || evt.key === "к") && drawingIsFinished) {
+      setMessage("пробуем...");
+      console.log("пробуем...");
       const savedCoords = JSON.parse(localStorage.getItem("coords"));
       setCoordinates(savedCoords);
       clear();
       replay();
-    } else if (evt.key === "c") {
+    } else if (evt.key === "c" || evt.key === "с") {
       clear("full");
-      console.log("local storage пуст");
+      setMessage("local storage очищен");
+      console.log("local storage очищен");
     }
   }
+
   return (
     <section ref={aboutMe} className="aboutme">
       <h2 className="main__title">Обо мне</h2>
@@ -199,40 +259,72 @@ function AboutMe(props) {
             i
           </button>
           <button
-            onClick={() => setColor("#fff")}
+            onClick={() => setColor("#ffffff")}
             style={{
               ...btnStyle,
               top: "30px",
-              background: "#fff",
-              borderWidth: color === "#fff" ? "2px" : "1px",
+              background: "#ffffff",
+              borderWidth: color === "#ffffff" ? "2px" : "1px",
             }}
           ></button>
           <button
-            onClick={() => setColor("blue")}
+            onClick={() => setColor("#0400ff")}
             style={{
               ...btnStyle,
               top: "55px",
-              background: "blue",
-              borderWidth: color === "blue" ? "2px" : "1px",
+              background: "#0400ff",
+              borderWidth: color === "#0400ff" ? "2px" : "1px",
             }}
           ></button>
           <button
-            onClick={() => setColor("red")}
+            onClick={() => setColor("#ff0000")}
             style={{
               ...btnStyle,
               top: "80px",
-              background: "red",
-              borderWidth: color === "red" ? "2px" : "1px",
+              background: "#ff0000",
+              borderWidth: color === "#ff0000" ? "2px" : "1px",
             }}
           ></button>
+          <input
+            type="color"
+            onInput={(e) => setColor(e.target.value)}
+            value={color}
+            style={{
+              position: "absolute",
+              left: "220px",
+              width: "40px",
+              height: "40px",
+              top: "10px",
+              padding: 0,
+            }}
+          />
+          <span
+            style={{
+              position: "absolute",
+              textAlign: "center",
+              left: "15%",
+              width: "180px",
+              height: "20px",
+              top: "90%",
+              padding: 0,
+              font: "12px sans-serif",
+            }}
+          >
+            {message}
+          </span>
           <canvas
+            style={{ touchAction: "none" }}
             tabIndex="-1"
             width="270"
             height="327"
-            ref={(el) => (canvas = el)}
+            ref={canvasRef}
             onMouseMove={draw}
-            onMouseDown={() => setDrawing(true)}
-            onMouseUp={() => setDrawing(false)}
+            onTouchMove={draw}
+            onMouseDown={startDrawing}
+            onTouchStart={startDrawing}
+            onMouseUp={endDrawing}
+            onMouseOut={endDrawing}
+            onTouchEnd={endDrawing}
             onKeyDown={onKeyDown}
           ></canvas>
         </div>
