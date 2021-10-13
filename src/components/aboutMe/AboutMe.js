@@ -66,6 +66,7 @@ function AboutMe(props) {
   });
 
   const startDrawing = () => {
+    setMessage("");
     contextRef.current.beginPath();
     setIsDrawing(true);
   };
