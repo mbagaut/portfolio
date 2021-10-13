@@ -9,10 +9,13 @@ function ProjectCard(props) {
     type,
     techs,
     githubUrl,
+    githubUrlApi,
     linkText,
+    linkApiText,
     videoMkv,
     videoWebM,
     videoAv1,
+    deploy,
   } = card;
 
   const [hovered, setHovered] = React.useState(false);
@@ -61,7 +64,7 @@ function ProjectCard(props) {
           <p className="project__text">{type}</p>
           <p className="project__text">{techs}</p>
           <p className="project__text">
-            Github:{" "}
+            GitHub:{" "}
             <a
               href={githubUrl}
               target="_blank"
@@ -70,7 +73,21 @@ function ProjectCard(props) {
             >
               {linkText}
             </a>
+            {githubUrlApi && (
+              <>
+                <span>&#x20;</span>
+                <a
+                  href={githubUrlApi}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="project__github-link"
+                >
+                  {linkApiText}
+                </a>
+              </>
+            )}
           </p>
+          <p className="project__text">Deploy: {deploy}</p>
         </div>
       </article>
     </li>

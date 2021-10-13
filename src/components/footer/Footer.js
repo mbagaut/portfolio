@@ -27,7 +27,7 @@ function Footer() {
             rel="noopener noreferrer"
             className="footer__link"
           >
-            Github
+            GitHub
           </a>
         </li>
         <li className="footer__item">
